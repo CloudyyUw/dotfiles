@@ -10,6 +10,19 @@ MIRRORS_URL=(
   'Server = rsync://archlinux.pop-es.rnp.br/archlinux/$repo/os/$arch'
 )
 
+AUR_PACKAGES=(
+  'albert-git',
+  'remarkable'
+)
+
+PACMAN_PACKAGES="unzip nodejs npm yarn openssh go flatpak wget linux-headers intel-media-driver android-tools sshd blueman discord filezilla gimp kdenlive steam lib32-alsa-plugins lib32-libpulse lib32-openal"
+
+FLATPAK_PACKAGES=(
+  'org.telegram.desktop'
+  'com.obsproject.Studio'
+  'com.github.phase1geo.minder'
+)
+
 setup_fonts()
 {
   cp .fonts/ ~/.fonts/
@@ -109,6 +122,26 @@ EOF
   cp .albertignore ~/
 }
 
+setup_pacman_packages()
+{
+  pacman -Syy $PACMAN_PACKAGES
+}
+
+setup_flatpak_packages()
+{
+  for P in "${FLATPAK_PACKAGES[@]}"; do
+    echo "Flatpak: $P"
+    flatpak install $P 
+  done
+} 
+
+setup_aur_packages()
+{
+  for PACKAGE in "${AUR_PACKAGES[@]}"; do 
+    git clone https://aur.archlinux.org/"$PACKAGE".git && cd $PACKAGE && makepkg -si && cd ..
+  done
+}
+
 while true; do 
   echo "1) Setup Nvim"
   echo "2) Setup Fonts"
@@ -116,9 +149,12 @@ while true; do
   echo "4) Setup git"
   echo "5) Setup ssh"
   echo "6) Setup bashrc/zshrc (and others)"
+  echo "7) Install pacman packages [root]"
+  echo "8) Install flatpak packages"
+  echo "9) Install AUR packages"
   echo "0) Exit"
   echo 
-  read -p "[0 ~ 6] -> " opt
+  read -p "[0 ~ 9] -> " opt
 
   case $opt in
     1 ) setup_nvim;;
@@ -127,6 +163,9 @@ while true; do
     4 ) setup_git;;
     5 ) setup_ssh;;
     6 ) setup_bash_zshrc_others;;
+    7 ) setup_pacman_packages;;
+    8 ) setup_flatpak_packages;;
+    9 ) setup_aur_packages;;
     0 ) echo "Bye"; exit;;
   esac
 done

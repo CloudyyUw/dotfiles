@@ -1,0 +1,12 @@
+node_modules
+yay
+.cache
+.java
+.npm
+.var
+.icons
+.yarn
+.themes
+.local
+.android
+.steam

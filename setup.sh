@@ -71,6 +71,58 @@ EOF
   cp .gitconfig ~/
 }
 
+setup_starship()
+{
+  cat > ~/.config/starship.toml << "EOF"
+# v0.1
+# format = """[](fg:235)[](bg:235)$username$hostname$directory$git_branch$time[i](fg:235 bg:235)[](fg:235) $character """
+format = """$username$hostname$directory$git_branch(fg:235)(fg:235) $character """
+
+add_newline=false
+
+[username]
+disabled = false
+show_always = false
+format = "[$user]($style)"
+style_user = "fg:203"
+
+[hostname]
+disabled = false
+ssh_only = true
+format = "[  $hostname]($style)"
+style = "fg:222"
+
+[character]
+success_symbol = "[](fg:077)"
+error_symbol = "[](fg:160)"
+
+[directory]
+format = "[  $path]($style)"
+style = "fg:183 italic"
+truncation_length = 2
+truncate_to_repo = true
+truncation_symbol = "…/"
+fish_style_pwd_dir_length = 0
+
+[cmd_duration]
+format = " took [$duration]($style)"
+style = "039"
+min_time = 10
+
+[time]
+disabled = true
+format = "[  $time]($style)"
+style = "fg:203 bg:235"
+
+[git_branch]
+style = "bold fg:140"
+format = "[  $branch]($style)"
+
+[git_status]
+style = "fg:248"
+EOF
+}
+
 setup_ssh()
 {
   cp .ssh ~/.ssh
@@ -90,6 +142,9 @@ setup_bash_zshrc_others()
 
 # If not running interactively, don't do anything
 [[ $- != *i* ]] && return
+
+export PATH=/home/cloudyy/.local/bin:$PATH
+eval "$(starship init bash)"
 
 alias ls='ls --color=auto'
 PS1='[\u@\h \W]\$ '
@@ -152,9 +207,10 @@ while true; do
   echo "7) Install pacman packages [root]"
   echo "8) Install flatpak packages"
   echo "9) Install AUR packages"
+  echo "10) Setup Starship"
   echo "0) Exit"
   echo 
-  read -p "[0 ~ 9] -> " opt
+  read -p "[0 ~ 10] -> " opt
 
   case $opt in
     1 ) setup_nvim;;
@@ -166,6 +222,7 @@ while true; do
     7 ) setup_pacman_packages;;
     8 ) setup_flatpak_packages;;
     9 ) setup_aur_packages;;
+    10 ) setup_starship;;
     0 ) echo "Bye"; exit;;
   esac
 done

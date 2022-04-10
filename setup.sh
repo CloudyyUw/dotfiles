@@ -197,6 +197,44 @@ setup_aur_packages()
   done
 }
 
+setup_date()
+{
+  sudo pacman -Syy ntp
+  sudo rm /etc/ntp.conf 
+
+  sudo cat > /etc/ntp.conf << "EOF"
+# Please consider joining the pool:
+#
+#     http://www.pool.ntp.org/join.html
+#
+# For additional information see:
+# - https://wiki.archlinux.org/index.php/Network_Time_Protocol_daemon
+# - http://support.ntp.org/bin/view/Support/GettingStarted
+# - the ntp.conf man page
+
+# Associate to Arch's NTP pool
+server a.st1.ntp.br iburst nts
+server b.st1.ntp.br iburst nts
+server c.st1.ntp.br iburst nts
+server d.st1.ntp.br iburst nts
+server gps.ntp.br iburst nts
+
+# By default, the server allows:
+# - all queries from the local host
+# - only time queries from remote hosts, protected by rate limiting and kod
+restrict default kod limited nomodify nopeer noquery notrap
+restrict 127.0.0.1
+restrict ::1
+                                                                                                                                       
+# Location of drift file                                                                                                               
+driftfile /var/lib/ntp/ntp.drift
+EOF
+
+  sudo systemctl start ntpd
+  sudo systemctl enable ntpd
+  sudo ntpd
+}
+
 while true; do 
   echo "1) Setup Nvim"
   echo "2) Setup Fonts"
@@ -208,6 +246,7 @@ while true; do
   echo "8) Install flatpak packages"
   echo "9) Install AUR packages"
   echo "10) Setup Starship"
+  echo "11) Set date/time"
   echo "0) Exit"
   echo 
   read -p "[0 ~ 10] -> " opt
@@ -223,6 +262,7 @@ while true; do
     8 ) setup_flatpak_packages;;
     9 ) setup_aur_packages;;
     10 ) setup_starship;;
+    11 ) setup_date;;
     0 ) echo "Bye"; exit;;
   esac
 done
